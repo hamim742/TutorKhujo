@@ -23,7 +23,8 @@ import {
   Mail,
   CheckCircle,
   Clock,
-  BadgeCheck
+  BadgeCheck,
+  Gift
 } from "lucide-react";
 
 type SignupStep = 1 | 2 | 3;
@@ -39,6 +40,7 @@ export default function SignupClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mobile, setMobile] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState<{
@@ -164,7 +166,14 @@ export default function SignupClient() {
     setFormErrors({});
     setError("");
     try {
-      await api.post("/auth/register", { name, email, password, mobile: formattedMobile, role });
+      await api.post("/auth/register", {
+        name,
+        email,
+        password,
+        mobile: formattedMobile,
+        role,
+        referralCode: referralCode.trim() ? referralCode.trim().toUpperCase() : undefined,
+      });
       setStep(3);
       setOtpTimer(59);
       setIsResendActive(false);
@@ -690,8 +699,44 @@ export default function SignupClient() {
                   )}
                 </div>
 
+                {/* Referral Code (Optional) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">
+                      Referral Code
+                    </label>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 uppercase tracking-wider">
+                      Optional
+                    </span>
+                  </div>
+                  <div className="flex rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 focus-within:ring-2 focus-within:ring-[#0F5B47] transition-all">
+                    <div className="bg-zinc-50 dark:bg-zinc-800/60 px-3.5 py-3 text-zinc-400 flex items-center">
+                      <Gift className="w-4 h-4 text-[#0F5B47]" />
+                    </div>
+                    <input
+                      type="text"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                      placeholder="e.g. TK-66IQWU"
+                      className="flex-1 px-3 py-3 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none text-xs md:text-sm uppercase tracking-wider"
+                    />
+                    {referralCode && (
+                      <button
+                        type="button"
+                        onClick={() => setReferralCode("")}
+                        className="px-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#0F5B47] dark:text-emerald-400 font-medium pl-1">
+                    🎁 Have a friend's referral code? Enter it to get welcome reward points!
+                  </p>
+                </div>
+
                 <p className="text-[10px] text-zinc-400 dark:text-zinc-500 italic">
-                  * A 4-digit OTP will be sent for email and phone verification.
+                  * A 6-digit OTP will be sent for email verification.
                 </p>
 
                 {/* Submit button */}
